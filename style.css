@@ -1,0 +1,1231 @@
+/* ============================================================
+   Color Palette Tokens
+   ============================================================ */
+:root {
+  --c-snow: #f4fcfc;       /* Sparkling Snow (Pure White Light) */
+  --c-aqua: #86d0cf;       /* Aqua Splash */
+  --c-havasupai: #0faec1;  /* Havasupai Falls (Vibrant Cyan) */
+  --c-bath: #0f6b6f;       /* Bath Green (Dark Teal) */
+  --c-roof: #042f30;       /* Roof Tile Green (Very Dark Teal) */
+  --c-metal: #040803;      /* Black Metal (Almost Black Background) */
+
+  /* Assigned roles */
+  --bg: var(--c-metal);
+  --panel: rgba(4, 47, 48, 0.4);
+  --ink: var(--c-snow);
+  --ink-soft: var(--c-aqua);
+  --line: var(--c-bath);
+  --accent: var(--c-havasupai);
+  --accent-2: var(--c-snow);
+
+  --nav-h: 72px;
+  --radius: 12px;
+  --glow-shadow: 0 0 25px rgba(15, 174, 193, 0.35);
+  --glow-hover: 0 0 40px rgba(244, 252, 252, 0.6);
+
+  /* Motion tokens — shallow, electronic-signal easing (snappy, no bounce) */
+  --ease-signal: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-electric: cubic-bezier(0.05, 0.85, 0.15, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Reset & Base
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", Arial, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* ============================================================
+   Scroll progress indicator — thin electronic signal trace
+   ============================================================ */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 40;
+  background: transparent;
+  pointer-events: none;
+}
+.scroll-progress::before {
+  content: "";
+  display: block;
+  height: 100%;
+  width: var(--scroll, 0%);
+  background: linear-gradient(90deg, var(--c-bath), var(--accent), var(--c-snow));
+  box-shadow: 0 0 10px rgba(15, 174, 193, 0.8), 0 0 2px rgba(244, 252, 252, 0.9);
+  transition: width 0.08s linear;
+}
+/* Electric leading edge dot on scroll progress */
+.scroll-progress::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: var(--scroll, 0%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-snow);
+  box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent), 0 0 4px #fff;
+  transition: left 0.08s linear;
+  opacity: 0.9;
+}
+
+/* ============================================================
+   Circuit trace background accent (decorative, aria-hidden)
+   ============================================================ */
+.circuit-lines {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(15, 174, 193, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 174, 193, 0.07) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 90%);
+  animation: circuit-drift 40s linear infinite;
+}
+@keyframes circuit-drift {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 42px 84px, 42px 84px; }
+}
+@media (max-width: 760px) {
+  .circuit-lines { opacity: 0.2; background-size: 32px 32px; }
+}
+
+/* ============================================================
+   Background Layers (clean, no grid)
+   ============================================================ */
+.light-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 90% 10%, rgba(15, 107, 111, 0.4), transparent 60%);
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+h1, h2, h3 {
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================
+   Animations — Cyber / Electronic Engineering Scroll Reveals
+   ============================================================ */
+
+/* Base fade-in with electric flicker effect */
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s var(--ease-signal), transform 0.8s var(--ease-signal), filter 0.8s var(--ease-signal);
+  filter: blur(2px);
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  animation: electric-flicker 0.6s var(--ease-electric) forwards;
+}
+
+@keyframes electric-flicker {
+  0% { opacity: 0.4; }
+  15% { opacity: 1; }
+  25% { opacity: 0.7; }
+  35% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Staggered "power-on" reveal for grid children — small sequential delay,
+   like traces energizing one after another on a PCB */
+.stagger-child {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition: opacity 0.6s var(--ease-signal), transform 0.6s var(--ease-signal);
+  transition-delay: calc(var(--i, 0) * 120ms);
+}
+.stagger-child.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: card-power-on 0.7s var(--ease-electric) forwards;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+@keyframes card-power-on {
+  0% { 
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  30% { 
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(15, 174, 193, 0.5), inset 0 0 20px rgba(15, 174, 193, 0.05);
+  }
+  60% {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(15, 174, 193, 0.2);
+  }
+  100% { 
+    opacity: 1;
+    border-color: var(--line);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Section label "// About" etc — cyber scanline entrance */
+.section-label {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  margin: 0 0 10px;
+  position: relative;
+  overflow: hidden;
+}
+.fade-in.visible .section-label {
+  animation: label-scan 0.8s var(--ease-electric) 0.2s both;
+}
+@keyframes label-scan {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    text-shadow: none;
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+    text-shadow: 0 0 8px var(--accent), 0 0 20px rgba(15, 174, 193, 0.4);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    text-shadow: 0 0 4px rgba(15, 174, 193, 0.2);
+  }
+}
+
+/* Electric scanline overlay on glass cards during hover */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--c-snow), var(--accent), transparent);
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.glass-card:hover::before {
+  opacity: 0.7;
+  animation: scan-line 1.4s var(--ease-out) forwards;
+}
+@keyframes scan-line {
+  0% { transform: translateY(0); opacity: 0.7; }
+  100% { transform: translateY(calc(100% + 200px)); opacity: 0; }
+}
+
+/* ============================================================
+   Interactive feedback — ripple + press (electric pulse, shallow)
+   ============================================================ */
+.interactive {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(244, 252, 252, 0.5) 0%, rgba(15, 174, 193, 0.3) 45%, transparent 72%);
+  transform: scale(0);
+  animation: ripple-out 650ms var(--ease-out) forwards;
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+@keyframes ripple-out {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* Electric arc ripple — second layer for cyber feel */
+.electric-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid rgba(15, 174, 193, 0.6);
+  transform: scale(0);
+  animation: electric-ring-out 800ms var(--ease-out) forwards;
+  z-index: 0;
+}
+@keyframes electric-ring-out {
+  0% { transform: scale(0); opacity: 1; border-width: 2px; }
+  100% { transform: scale(3); opacity: 0; border-width: 0.5px; }
+}
+
+.btn.interactive, .nav-cta.interactive {
+  transition: transform 0.22s var(--ease-signal), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.btn.interactive:active, .nav-cta.interactive:active {
+  transform: translateY(0) scale(0.96);
+  transition-duration: 0.09s;
+}
+
+/* Electric text shimmer on gradient-text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--c-snow) 0%, var(--c-havasupai) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================================
+   Glassmorphism
+   ============================================================ */
+.glass-card {
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.glass-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow-shadow), 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: translateY(-4px); /* fallback for non-.interactive cards / coarse pointers */
+}
+
+/* Electric corner accents on glass cards */
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background:
+    linear-gradient(135deg, rgba(15, 174, 193, 0.3) 0%, transparent 20%),
+    linear-gradient(315deg, rgba(15, 174, 193, 0.15) 0%, transparent 20%);
+}
+.glass-card:hover::after {
+  opacity: 1;
+}
+
+/* Cards that also carry .interactive get their lift+tilt from the JS-driven
+   --rx/--ry/--ty variables set in the "Interactive feedback" block below,
+   so the plain hover transform is neutralized there to avoid fighting it. */
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(4, 8, 3, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+  transition: all 0.3s ease;
+}
+.logo:hover {
+  color: var(--accent);
+}
+.logo:hover .logo-mark {
+  animation: logo-pulse 0.5s var(--ease-electric);
+}
+@keyframes logo-pulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 0px var(--accent)); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 8px var(--accent)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--accent)); }
+}
+
+.logo-mark {
+  color: var(--accent);
+  display: inline-flex;
+  transition: filter 0.3s ease;
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.3s ease, transform 0.15s var(--ease-signal);
+}
+.mobile-toggle:hover {
+  color: var(--accent);
+}
+.mobile-toggle:active {
+  transform: scale(0.9);
+}
+.mobile-toggle .bar {
+  transform-origin: center;
+  transition: transform 0.35s var(--ease-signal), opacity 0.2s ease;
+}
+.mobile-toggle.is-open .bar-top { transform: translateY(6px) rotate(45deg); }
+.mobile-toggle.is-open .bar-mid { opacity: 0; transform: scaleX(0); }
+.mobile-toggle.is-open .bar-bot { transform: translateY(-6px) rotate(-45deg); }
+
+/* Dim overlay behind the mobile menu */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 3, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 22;
+}
+.nav-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-link {
+  font-size: 0.94rem;
+  color: var(--ink-soft);
+  padding: 4px 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px var(--accent);
+}
+.nav-link:hover {
+  color: var(--c-snow);
+  text-shadow: 0 0 8px rgba(15, 174, 193, 0.3);
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-cta {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 9px 20px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: var(--glow-shadow);
+  position: relative;
+  overflow: hidden;
+}
+/* Electric sweep effect on CTA */
+.nav-cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: none;
+  z-index: 1;
+}
+.nav-cta:hover::before {
+  animation: electric-sweep 0.6s var(--ease-out) forwards;
+}
+@keyframes electric-sweep {
+  0% { left: -60%; }
+  100% { left: 120%; }
+}
+.nav-cta:hover {
+  background: var(--c-snow);
+  box-shadow: var(--glow-hover);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.section {
+  padding: 90px 0;
+  border-top: 1px solid rgba(15, 107, 111, 0.3);
+  position: relative;
+}
+
+/* Section border electric pulse on reveal */
+.section::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--c-snow), var(--accent));
+  box-shadow: 0 0 8px var(--accent);
+  transition: width 1.2s var(--ease-electric);
+  z-index: 1;
+}
+.section.visible::before {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 1.9rem;
+  margin-bottom: 6px;
+}
+
+.section-note {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  margin: 0 0 32px;
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding: 60px 0;
+}
+
+.hero-text {
+  flex: 1 1 420px;
+  max-width: 560px;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--accent);
+  font-size: 0.88rem;
+  margin: 0 0 18px;
+  position: relative;
+}
+/* Terminal cursor blink after eyebrow */
+.eyebrow::after {
+  content: "█";
+  font-size: 0.85em;
+  color: var(--accent);
+  margin-left: 4px;
+  animation: cursor-blink 1s step-end infinite;
+}
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.hero-text h1 {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+
+.hero-sub {
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(15, 107, 111, 0.3);
+  padding-top: 20px;
+}
+
+.meta-label {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.meta-value {
+  font-weight: 600;
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-snow);
+  display: inline-block;
+  box-shadow: 0 0 10px var(--c-snow);
+  animation: pulse-dot 1.8s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px var(--c-snow); }
+  50% { opacity: 0.5; transform: scale(1.3); box-shadow: 0 0 20px var(--c-snow), 0 0 40px rgba(15, 174, 193, 0.3); }
+}
+
+/* ============================================================
+   Buttons — electric engineering vibe
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 24px;
+  border-radius: 7px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Electric sweep on all buttons */
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+.btn:hover::before {
+  animation: electric-sweep 0.5s var(--ease-out) forwards;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: var(--glow-shadow);
+  animation: signal-breathe 3.2s ease-in-out infinite;
+}
+.btn-primary:hover {
+  background: var(--c-snow);
+  box-shadow: var(--glow-hover);
+  transform: translateY(-2px);
+  animation-play-state: paused;
+}
+
+@keyframes signal-breathe {
+  0%, 100% { box-shadow: 0 0 25px rgba(15, 174, 193, 0.35); }
+  50% { box-shadow: 0 0 16px rgba(15, 174, 193, 0.55); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary { animation: none; }
+}
+
+.btn-secondary {
+  background: rgba(15, 174, 193, 0.1);
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-shadow);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+.btn-ghost:hover {
+  border-color: var(--c-snow);
+  color: var(--c-snow);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(244, 252, 252, 0.3);
+}
+
+/* ============================================================
+   About
+   ============================================================ */
+.about-grid {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.about-text {
+  flex: 1 1 380px;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+}
+
+.about-facts {
+  flex: 1 1 280px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-facts li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, padding-left 0.3s ease;
+}
+.about-facts li:hover {
+  border-bottom-color: var(--accent);
+  padding-left: 4px;
+}
+.about-facts li span {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+/* ============================================================
+   Skills
+   ============================================================ */
+.skills-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.skill-group {
+  flex: 1 1 260px;
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+.skill-group:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow-shadow);
+  transform: translateY(-4px);
+}
+
+.skill-group h3 {
+  font-size: 1.02rem;
+  margin-bottom: 14px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  background: rgba(4, 8, 3, 0.5);
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--c-snow);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(15, 174, 193, 0.3);
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+  box-shadow: 0 0 5px var(--accent);
+  transition: box-shadow 0.3s ease;
+}
+.chip:hover .chip-dot {
+  box-shadow: 0 0 10px var(--accent), 0 0 20px rgba(15, 174, 193, 0.4);
+  animation: node-pulse 0.6s var(--ease-electric);
+}
+@keyframes node-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.8); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   Projects
+   ============================================================ */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.project-card {
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+.project-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+  box-shadow: var(--glow-shadow), 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.project-id {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+
+.project-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(15, 174, 193, 0.15);
+  color: var(--accent);
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+.project-card:hover .project-icon {
+  transform: scale(1.1);
+  color: var(--c-snow);
+  background: rgba(244, 252, 252, 0.15);
+  box-shadow: var(--glow-shadow);
+  animation: icon-charge 0.5s var(--ease-electric);
+}
+@keyframes icon-charge {
+  0% { box-shadow: 0 0 0px rgba(15, 174, 193, 0); }
+  40% { box-shadow: 0 0 25px rgba(15, 174, 193, 0.6), 0 0 50px rgba(15, 174, 193, 0.2); }
+  100% { box-shadow: var(--glow-shadow); }
+}
+
+.project-card h3 {
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+}
+
+.project-card p {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
+}
+
+.tag-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--c-snow);
+  background: rgba(4, 47, 48, 0.8);
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+.tag:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(15, 174, 193, 0.3);
+}
+
+/* ============================================================
+   Contact
+   ============================================================ */
+.contact-panel {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 56px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.contact-panel:hover {
+  border-color: var(--c-snow);
+  box-shadow: var(--glow-shadow), 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.contact-panel h2 {
+  font-size: 1.7rem;
+}
+
+.contact-panel > p {
+  color: var(--ink-soft);
+  max-width: 460px;
+  margin: 0 auto 28px;
+}
+
+.contact-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contact-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  opacity: 0.6;
+  transition: all 0.4s ease;
+}
+.contact-panel:hover .contact-corner {
+  opacity: 1;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+.contact-corner.tl { top: 14px; left: 14px; border-right: none; border-bottom: none; }
+.contact-corner.tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+.contact-corner.bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
+.contact-corner.br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.footer {
+  text-align: center;
+  padding: 28px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  border-top: 1px solid rgba(15, 107, 111, 0.3);
+}
+
+/* ============================================================
+   Electric Particle Canvas (injected by JS)
+   ============================================================ */
+#electricCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 860px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .nav {
+    padding: 0 18px;
+    padding-top: env(safe-area-inset-top, 0);
+    height: calc(var(--nav-h) + env(safe-area-inset-top, 0));
+  }
+  .mobile-toggle {
+    display: block;
+  }
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: min(78vw, 280px);
+    height: 100vh;
+    height: 100dvh;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+    background: rgba(4, 8, 3, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-left: 1px solid var(--line);
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 4px;
+    transition: right 0.4s var(--ease-signal);
+    z-index: 25;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  }
+  .nav-links.active {
+    right: 0;
+  }
+  .nav-links .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+    font-size: 1.05rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-links .nav-link::after {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 8px;
+  }
+  .nav-links .nav-link:hover::after,
+  .nav-links .nav-link:active::after {
+    width: 32px;
+  }
+  .nav-links .nav-cta {
+    margin: 14px auto 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  main {
+    padding: 0 18px;
+  }
+  .contact-panel {
+    padding: 32px 20px;
+  }
+  /* Comfortable tap targets everywhere on touch/small screens */
+  .btn {
+    min-height: 46px;
+    padding: 12px 22px;
+  }
+  .chip {
+    padding: 8px 13px;
+    min-height: 36px;
+  }
+  .section {
+    padding: 64px 0;
+  }
+  /* Improve about layout on mobile */
+  .about-grid {
+    gap: 28px;
+  }
+  .about-facts li {
+    flex-direction: column;
+    gap: 4px;
+  }
+  /* Make hero meta wrap nicely on tablets */
+  .hero-meta {
+    gap: 24px;
+  }
+  .hero-meta > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  /* Skills grid — 2 per row on tablets */
+  .skills-grid {
+    gap: 16px;
+  }
+  .skill-group {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    padding: 40px 0;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-actions .btn {
+    justify-content: center;
+    width: 100%;
+  }
+  .hero-meta {
+    gap: 20px;
+  }
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  /* Full-width skill cards on phone */
+  .skill-group {
+    flex: 1 1 100%;
+  }
+  /* Section titles scale down */
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .contact-panel h2 {
+    font-size: 1.35rem;
+  }
+  /* Contact buttons stack on narrow phones */
+  .contact-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .contact-row .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Extra-small phones (< 380px) */
+@media (max-width: 380px) {
+  main {
+    padding: 0 12px;
+  }
+  .nav {
+    padding: 0 12px;
+  }
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  .hero-sub {
+    font-size: 0.95rem;
+  }
+  .btn {
+    font-size: 0.88rem;
+    padding: 10px 16px;
+  }
+}
+
+/* Comfortable pointer-target sizing on any coarse pointer (phones/tablets),
+   regardless of viewport width — covers landscape phones and small tablets */
+@media (pointer: coarse) {
+  .nav-link, .btn, .nav-cta {
+    min-height: 44px;
+  }
+  .mobile-toggle {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ============================================================
+   Card tilt + touch feedback (placed last so it takes priority
+   over the earlier per-card hover rules for elements that are
+   also .interactive, without touching their base styles)
+   ============================================================ */
+@media (hover: hover) and (pointer: fine) {
+  .glass-card.interactive {
+    transform-style: preserve-3d;
+    perspective: 800px;
+    transition: transform 0.35s var(--ease-signal), border-color 0.3s ease, box-shadow 0.3s ease;
+    transform: rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)) translateY(var(--ty, 0px));
+  }
+}
+
+@media (hover: none) {
+  .glass-card.interactive:active {
+    border-color: var(--accent);
+    box-shadow: var(--glow-shadow), 0 8px 32px rgba(0, 0, 0, 0.5);
+    transform: scale(0.985);
+  }
+  .chip:active {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(15, 174, 193, 0.3);
+  }
+}
